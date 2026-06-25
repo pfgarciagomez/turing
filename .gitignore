@@ -1,0 +1,32 @@
+# === Secrets ===
+.env
+.env.local
+*.key
+
+# === Python ===
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# === Data / vector store (regenerable, no se versiona) ===
+data/chroma/
+data/comprehensive_rules.txt
+data/cache/
+
+# === Node / Next.js ===
+node_modules/
+frontend/.next/
+frontend/out/
+frontend/node_modules/
+npm-debug.log*
+
+# === OS / IDE ===
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
