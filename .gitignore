@@ -17,6 +17,7 @@ __pycache__/
 data/chroma/
 data/comprehensive_rules.txt
 data/cache/
+data/sessions/
 
 # === Node / Next.js ===
 node_modules/
