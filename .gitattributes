@@ -1,0 +1,7 @@
+# Normaliza finales de línea: el repo guarda LF, el checkout respeta cada SO.
+* text=auto eol=lf
+
+# Binarios: nunca normalizar.
+*.png binary
+*.jpg binary
+*.pdf binary
