@@ -32,14 +32,29 @@ CARD_INTERACTION_SYSTEM = (
     "Lo importante es que la respuesta esté fundamentada, no acertar el ruling oficial."
 )
 
+# Clasificación de intención (router). Salida estructurada con un enum fijo.
+ROUTER_SYSTEM = (
+    "Clasifica la consulta del usuario (sobre Magic: The Gathering) en UNA intención:\n"
+    "- 'reglas_basicas': duda general de reglas (fases del turno, maná, cómo funciona X).\n"
+    "- 'interaccion_cartas': interacción entre dos o más cartas concretas nombradas.\n"
+    "- 'buscar_carta': busca cartas por descripción (color, coste, tipo, subtipo...).\n"
+    "- 'crear_carta': pide diseñar/crear una carta custom nueva.\n"
+    "Devuelve solo el campo 'intent'."
+)
+
 # Extracción de filtros de búsqueda de cartas (capacidad 3, function calling).
 CARD_FILTERS_SYSTEM = (
     "Extrae filtros de búsqueda de cartas de Magic: The Gathering a partir de la "
-    "descripción del usuario (en español). Devuelve SOLO los campos mencionados. "
-    "Colores en notación WUBRG: blanco=W, azul=U, negro=B, rojo=R, verde=G. "
-    "Traduce el tipo/subtipo al inglés (guerrero->Warrior, criatura->Creature). "
-    "Para 'coste inferior a N' usa cmc_max=N; 'superior a N' usa cmc_min=N; "
-    "'coste N' usa cmc=N."
+    "descripción del usuario (en español). Devuelve SOLO los campos mencionados; "
+    "OMITE por completo cualquier campo no mencionado (no lo pongas como 'null' ni "
+    "vacío).\n"
+    "- Colores en notación WUBRG: blanco=W, azul=U, negro=B, rojo=R, verde=G.\n"
+    "- types = tipo de carta (Creature, Instant, Sorcery, Artifact, Enchantment...).\n"
+    "- subtypes = raza/clase de criatura. 'guerrero'->Warrior, 'soldado'->Soldier, "
+    "'mago'->Wizard, 'goblin'->Goblin, 'ángel'->Angel. ¡'guerrero' va en subtypes!\n"
+    "- 'coste inferior a N' -> cmc_max=N; 'superior a N' -> cmc_min=N; 'coste N' -> cmc=N.\n"
+    "Ejemplo: 'carta blanca de coste inferior a dos que sea guerrero' -> "
+    '{"colors": ["W"], "subtypes": ["Warrior"], "cmc_max": 2}'
 )
 
 # Creación de carta custom (bonus, capacidad 4): salida JSON estructurada.

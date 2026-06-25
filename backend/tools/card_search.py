@@ -20,7 +20,7 @@ from pathlib import Path
 from typing import Any
 
 import httpx
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from tenacity import (
     retry,
     retry_if_exception,
@@ -29,6 +29,11 @@ from tenacity import (
 )
 
 from backend.config import Settings, get_settings
+from backend.prompts import CARD_FILTERS_SYSTEM
+
+# El LLM a veces rellena campos opcionales con la cadena "null"/"none" en vez de
+# omitirlos; estos centinelas se tratan como ausencia (si no, contaminan la query).
+_SENTINELS = {"", "null", "none", "n/a", "any"}
 
 
 class CardFilters(BaseModel):
@@ -45,6 +50,20 @@ class CardFilters(BaseModel):
     toughness: str | None = None
     rarity: str | None = None
     page_size: int = 20
+
+    @field_validator("name", "power", "toughness", "rarity", mode="before")
+    @classmethod
+    def _clean_str(cls, v):
+        if isinstance(v, str) and v.strip().lower() in _SENTINELS:
+            return None
+        return v
+
+    @field_validator("colors", "types", "subtypes", mode="before")
+    @classmethod
+    def _clean_list(cls, v):
+        if not isinstance(v, list):
+            return v
+        return [x for x in v if not (isinstance(x, str) and x.strip().lower() in _SENTINELS)]
 
 
 # Schema para la extracción por function calling (lo consume llm.extract_json).
@@ -63,16 +82,6 @@ CARD_FILTERS_SCHEMA: dict[str, Any] = {
         "rarity": {"type": "string"},
     },
 }
-
-_FILTERS_SYSTEM = (
-    "Extrae filtros de búsqueda de cartas de Magic: The Gathering a partir de la "
-    "descripción del usuario (en español). Devuelve SOLO los campos mencionados. "
-    "Colores en notación WUBRG: blanco=W, azul=U, negro=B, rojo=R, verde=G. "
-    "Traduce el tipo/subtipo al inglés (guerrero->Warrior, criatura->Creature). "
-    "Para 'coste inferior a N' usa cmc_max=N; 'superior a N' usa cmc_min=N; "
-    "'coste N' usa cmc=N."
-)
-
 
 def build_query_params(filters: CardFilters) -> dict[str, str]:
     """Traduce los filtros a parámetros que la API MTG soporta directamente.
@@ -168,5 +177,5 @@ def extract_filters(user_text: str, llm: Any | None = None) -> CardFilters:
         from backend.llm import LLMClient
 
         llm = LLMClient()
-    raw = llm.extract_json(_FILTERS_SYSTEM, user_text, CARD_FILTERS_SCHEMA)
+    raw = llm.extract_json(CARD_FILTERS_SYSTEM, user_text, CARD_FILTERS_SCHEMA)
     return CardFilters.model_validate(raw)

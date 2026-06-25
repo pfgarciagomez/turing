@@ -83,6 +83,17 @@ def test_search_applies_white_warrior_and_cmc_max(tmp_path):
     assert [c["name"] for c in out] == ["Soldier"]
 
 
+def test_filters_drop_sentinel_strings():
+    # El LLM a veces rellena campos opcionales con "null"/"none" en vez de omitirlos;
+    # el validador los neutraliza para que no contaminen la query (regresión real).
+    f = CardFilters.model_validate(
+        {"colors": ["W"], "cmc_max": 2, "rarity": "null", "subtypes": ["none", "Warrior"]}
+    )
+    assert f.rarity is None
+    assert f.subtypes == ["Warrior"]
+    assert "rarity" not in build_query_params(f)
+
+
 def test_is_retryable_classification():
     assert _is_retryable(httpx.ConnectError("boom")) is True
     resp429 = httpx.Response(429, request=httpx.Request("GET", CARDS_URL))
