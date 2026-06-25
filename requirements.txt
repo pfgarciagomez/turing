@@ -5,11 +5,15 @@ pydantic==2.10.4
 pydantic-settings==2.7.1
 python-dotenv==1.0.1
 
-# --- LLM + embeddings (Gemini) ---
-google-genai==0.8.0
+# --- LLM (Gemini, chat + function calling) ---
+google-genai>=1.0
+
+# --- Embeddings locales multilingües (default; ver decisions.md) ---
+sentence-transformers>=3.0
 
 # --- Vector store ---
-chromadb==0.5.23
+# 1.x trae binarios precompilados (en Windows/py3.12 la rama 0.5.x exige compilar chroma-hnswlib).
+chromadb>=1.0,<2.0
 
 # --- HTTP (API de cartas) + reintentos ---
 httpx==0.28.1

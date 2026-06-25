@@ -19,8 +19,8 @@
 |---|---|---|
 | Backend / lógica IA | **Python + FastAPI** | Ecosistema de DS/RAG vive en Python; Chroma es nativo Python; tests en `pytest`. |
 | Frontend | **Next.js (App Router) + React** | UI de chat fina, deploy fácil en Vercel. Habla con el backend por HTTP. |
-| LLM (chat + tools) | **Gemini Flash** (`gemini-2.0-flash`) | Tier gratuito de AI Studio (~1.500 req/día sin tarjeta); soporta *function calling* y responde bien en español. |
-| Embeddings | **Gemini embeddings** (`text-embedding-004`) | Multilingües: ES y EN caen en el mismo espacio vectorial → retrieval cross-lingual sin traducir. |
+| LLM (chat + tools) | **Gemini Flash** (`gemini-2.5-flash`) | Tier gratuito de AI Studio; soporta *function calling* y responde bien en español. (`gemini-2.0-flash` agota la cuota gratuita enseguida → 429.) |
+| Embeddings | **Locales: e5 multilingüe** (`intfloat/multilingual-e5-base`) | Coste cero, sin rate limit, offline; cross-lingual ES↔EN sólido. Ver §2.3 para por qué **no** Gemini embeddings. |
 | Vector store | **Chroma** (persistente en disco) | Cero infra para la demo. En producción → gestionado (pgvector/Qdrant). |
 | Datos de cartas | **API magicthegathering.io** + caché local | Cachear respuestas para no repetir llamadas ni gastar cuota (límite ~5.000 req/h). |
 | Capa LLM | **Abstracción de proveedor + reintentos** | Aísla el SDK tras una interfaz propia; permite cambiar de modelo sin tocar la lógica. |
@@ -52,10 +52,32 @@
   lenguaje natural a una **query estructurada** (filtros color/cmc/type). *Function calling* encaja
   mejor y es más fiable que embeddings para eso.
 
+### 2.3 Embeddings locales (e5) en vez de Gemini embeddings — **decisión revisada**
+- **Plan inicial**: Gemini embeddings. **Cambio en F2**: embeddings **locales**.
+- **Por qué el cambio**: el tier gratuito de Gemini embeddings limita a **100 req/min y ~1.000/día**,
+  y **cada texto del lote cuenta como una request**. El reglamento son **~3.600 chunks** → embeddarlo
+  entero supera la cuota diaria. Es un límite del proveedor, no del código.
+- **Decisión**: `sentence-transformers` con **`intfloat/multilingual-e5-base`** (coste cero, sin rate
+  limit, offline). El **chat/function-calling sí sigue en Gemini** (`gemini-2.5-flash`), que es bajo
+  volumen y entra en cuota.
+- **Detalle e5**: requiere prefijos `query:` / `passage:` para retrieval asimétrico; el embedder los
+  aplica automáticamente. Con MiniLM (paraphrase) "¿Cómo funciona el maná?" no recuperaba la regla 106;
+  con e5-base sí (dist ≈ 0.40, top-1 = 106.3). El acento de "maná" despistaba a modelos más débiles.
+- **Abstracción**: `get_embedder()` permite volver a Gemini (`EMBED_BACKEND=gemini`) si hay cuota de pago.
+
+### 2.4 Chunking por nº de regla (+ filtro de cabeceras)
+- **Decisión**: `chunk_rules_text()` parte por regla numerada (`^\d{3}\.\d+[a-z]?`). Cada chunk = unidad
+  citable, con metadatos `{rule_id, section, type}` y un `store_id` estable (idempotencia al reingestar).
+- **Glosario**: indexado aparte como chunks `type=glossary` (mejora "¿qué es X?").
+- **Filtro de ruido**: se descartan reglas-cabecera cuyo cuerpo es solo el nombre del keyword
+  (p. ej. "702.118 Skulk", "205.2 Card Types"); su definición real está en la sub-regla (702.118a…).
+  Estos chunks de 1-2 palabras contaminaban el retrieval de consultas cortas. Pasamos de 3.868 a 3.608.
+
 ## 3. Decisiones pendientes / por documentar
-- [ ] Estrategia de chunking del reglamento (por nº de regla vs por secciones) — se fija en F2.
-- [ ] Esquema de metadatos de los chunks.
-- [ ] Manejo de rate limit / backoff de la API MTG.
+- [x] Chunking por nº de regla + glosario + filtro de cabeceras (§2.4).
+- [x] Metadatos de chunk: `{rule_id, section, type}`.
+- [x] Embeddings: locales e5 (§2.3); chat Gemini 2.5-flash.
+- [ ] Manejo de rate limit / backoff de la API MTG (hecho en card_search; documentar).
 - [ ] Esquema JSON de la carta custom (bonus).
 
 ## 4. Qué simplificamos por tiempo (y cómo iría en producción)

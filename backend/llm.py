@@ -8,9 +8,8 @@ from __future__ import annotations
 
 from typing import Any, Sequence
 
-from tenacity import retry, stop_after_attempt, wait_exponential
-
 from backend.config import Settings, get_settings
+from backend.gemini_retry import gemini_retry
 
 Message = dict[str, str]  # {"role": "user"|"model"|"system", "content": str}
 
@@ -30,7 +29,7 @@ class LLMClient:
             self._client = genai.Client(api_key=self._settings.require_api_key())
         return self._client
 
-    @retry(stop=stop_after_attempt(4), wait=wait_exponential(min=1, max=20))
+    @gemini_retry
     def generate(
         self,
         system: str,
@@ -51,7 +50,7 @@ class LLMClient:
         )
         return resp.text or ""
 
-    @retry(stop=stop_after_attempt(4), wait=wait_exponential(min=1, max=20))
+    @gemini_retry
     def extract_json(
         self,
         system: str,

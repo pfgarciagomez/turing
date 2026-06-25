@@ -17,8 +17,17 @@ class Settings(BaseSettings):
 
     # --- Gemini (chat + embeddings) ---
     gemini_api_key: str = ""
-    gemini_chat_model: str = "gemini-2.0-flash"
-    gemini_embed_model: str = "text-embedding-004"
+    gemini_chat_model: str = "gemini-2.5-flash"
+    gemini_embed_model: str = "gemini-embedding-001"
+
+    # --- Embeddings ---
+    # "local" = sentence-transformers (coste cero, sin rate limit, cross-lingual).
+    # "gemini" = API de Gemini (limitado en tier gratuito; ver decisions.md).
+    embed_backend: str = "local"
+    # e5 multilingüe: retrieval cross-lingual ES<->EN sólido. Usa prefijos.
+    local_embed_model: str = "intfloat/multilingual-e5-base"
+    local_query_prefix: str = "query: "
+    local_passage_prefix: str = "passage: "
 
     # --- Vector store ---
     chroma_dir: str = "data/chroma"

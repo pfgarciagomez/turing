@@ -26,6 +26,12 @@ RULE_RE = re.compile(r"^(\d{3}\.\d+[a-z]?)\.?\s+(.*)$")
 TOP_SECTION_RE = re.compile(r"^(\d)\.\s+(\D.*)$")
 RULE_GROUP_RE = re.compile(r"^(\d{3})\.\s+(\D.*)$")
 
+# Mínimo de palabras para que un chunk de regla sea indexable. Muchas reglas
+# "cabecera" (p. ej. "702.118 Skulk", "205.2 Card Types") tienen como cuerpo solo
+# el nombre del keyword/título; su definición real vive en la sub-regla siguiente
+# (702.118a, 205.2a...). Esos chunks de 1-2 palabras solo añaden ruido al retrieval.
+MIN_RULE_WORDS = 4
+
 
 @dataclass(frozen=True)
 class RuleChunk:
@@ -60,7 +66,8 @@ def chunk_rules_text(text: str) -> list[RuleChunk]:
         nonlocal cur_id, cur_lines
         if cur_id is not None:
             body = " ".join(s.strip() for s in cur_lines if s.strip()).strip()
-            if body:
+            # Descarta cabeceras sin contenido real (cuerpo = nombre del keyword).
+            if body and len(body.split()) >= MIN_RULE_WORDS:
                 chunks.append(
                     RuleChunk(
                         rule_id=cur_id,
@@ -146,7 +153,8 @@ def load_corpus_text(path: str | Path) -> str:
         raise FileNotFoundError(f"No se encuentra el reglamento en: {path}")
     if path.suffix.lower() == ".pdf":
         return _extract_pdf_text(path)
-    return path.read_text(encoding="utf-8", errors="ignore")
+    # utf-8-sig: el TXT oficial de Wizards lleva BOM y comillas tipográficas.
+    return path.read_text(encoding="utf-8-sig", errors="replace")
 
 
 def _extract_pdf_text(path: Path) -> str:
@@ -169,10 +177,10 @@ def embed_and_load(
 ) -> int:
     import chromadb
 
-    from backend.embeddings import GeminiEmbedder
+    from backend.embeddings import get_embedder
 
     settings = settings or get_settings()
-    embedder = GeminiEmbedder(settings)
+    embedder = get_embedder(settings)
     client = chromadb.PersistentClient(path=settings.chroma_dir)
     collection = client.get_or_create_collection(settings.chroma_collection)
 
