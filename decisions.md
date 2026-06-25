@@ -77,11 +77,18 @@
 - [x] Chunking por nº de regla + glosario + filtro de cabeceras (§2.4).
 - [x] Metadatos de chunk: `{rule_id, section, type}`.
 - [x] Embeddings: locales e5 (§2.3); chat Gemini 2.5-flash.
-- [ ] Manejo de rate limit / backoff de la API MTG (hecho en card_search; documentar).
-- [ ] Esquema JSON de la carta custom (bonus).
+- [x] Manejo de rate limit / backoff de la API MTG (`MTGCardClient`: caché en disco +
+  backoff con `tenacity` solo ante 429/5xx; los 4xx de cliente no se reintentan).
+- [x] Esquema JSON de la carta custom (`CustomCard` en `backend/tools/card_builder.py`:
+  `name`, `mana_cost`, `colors`, `type_line`, `rules_text`, `power/toughness`, `rarity`,
+  `flavor_text`; validado con pydantic).
+- [x] Robustez de extracción de filtros: el LLM a veces devuelve `"null"`/`"none"` en
+  campos opcionales → un validador en `CardFilters` los neutraliza (si no, `rarity="null"`
+  contaminaba la query y devolvía 0 resultados).
 
 ## 4. Qué simplificamos por tiempo (y cómo iría en producción)
 - Caché de la API en disco/memoria → en prod, Redis con TTL.
 - Chroma local → en prod, vector DB gestionado (pgvector/Qdrant).
 - Memoria de conversación en fichero por sesión → en prod, Redis/Postgres con TTL y resumen.
-- (Se amplía en el documento de arquitectura productiva.)
+- Detalle completo en **[`ARCHITECTURE.md`](ARCHITECTURE.md)** (servicios, agentes,
+  observabilidad, guardrails, feedback loop, CI/CD).

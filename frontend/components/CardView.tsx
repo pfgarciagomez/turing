@@ -8,10 +8,21 @@ const COLOR_NAMES: Record<string, string> = {
   G: "Verde",
 };
 
+// La API usa códigos WUBRG; el LLM (carta custom) a veces devuelve el nombre completo
+// ("White", "Red"). Normalizamos ambos a la clase CSS del color.
+const COLOR_CODE: Record<string, string> = {
+  w: "w", white: "w", blanco: "w",
+  u: "u", blue: "u", azul: "u",
+  b: "b", black: "b", negro: "b",
+  r: "r", red: "r", rojo: "r",
+  g: "g", green: "g", verde: "g",
+};
+
 function colorClass(colors?: string[]): string {
   if (!colors || colors.length === 0) return "card--colorless";
   if (colors.length > 1) return "card--multi";
-  return `card--${colors[0].toLowerCase()}`;
+  const code = COLOR_CODE[colors[0].toLowerCase()];
+  return code ? `card--${code}` : "card--colorless";
 }
 
 // Carta custom del bonus (capacidad 4): se renderiza como una carta de MTG.
