@@ -83,9 +83,9 @@
 - **`top_k=10` (antes 6)**: como troceamos por nº de regla, muchos chunks son muy breves (una
   sola sub-regla). Más candidatos = contexto suficiente en preguntas que dependen de varias
   sub-reglas (p. ej. combate), con coste de tokens asumible en Flash.
-- **Umbral `rag_min_similarity=0.4`**: es un **mínimo de similitud** (mayor = más relevante). Las
-  buenas coincidencias caen en **~0.78–0.82**; 0.4 es deliberadamente **permisivo** (red de
-  seguridad anti-ruido), apoyándose en el grounding del prompt para ignorar lo poco relevante.
+- **Umbral `rag_min_similarity=0.6`**: es un **mínimo de similitud** (mayor = más relevante). Las
+  buenas coincidencias caen en **~0.78–0.82**; 0.6 corta el ruido sin perder lo relevante (apoyado
+  además en el grounding del prompt, que ignora lo poco pertinente).
 - **Garantía**: si *todo* supera el umbral, se conserva el **mejor resultado** (top-1) para no
   quedarse sin contexto en consultas límite; la capa RAG ya maneja el caso de 0 resultados.
 - **Cambiar la métrica obliga a reingestar** (el espacio se fija al crear la colección).
