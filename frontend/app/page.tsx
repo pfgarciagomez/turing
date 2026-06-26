@@ -14,6 +14,7 @@ const SUGGESTIONS = [
   },
   { cat: "Búsqueda", q: "Busco una carta blanca de coste inferior a dos que sea guerrero" },
   { cat: "Crear carta", q: "Quiero una carta de Han Solo, blanca-roja, que tenga dañar primero" },
+  { cat: "Novedades", q: "¿Qué lanzamientos o sets han salido recientemente?" },
 ];
 
 function newSessionId(): string {

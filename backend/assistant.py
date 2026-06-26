@@ -183,6 +183,22 @@ class Assistant:
         elif intent is Intent.CARD_SEARCH:
             payload = self._handle_card_search(question, step, t)
 
+        elif intent is Intent.RELEASES:
+            from backend.tools.releases import recent_sets
+
+            sets = recent_sets(self._get_mtg_client())
+            step(
+                "Consulta de lanzamientos (API MTG · /sets)",
+                f"{len(sets)} sets recientes ordenados por fecha de lanzamiento",
+                t,
+            )
+            if sets:
+                listed = "; ".join(f"{s['name']} ({s['releaseDate']})" for s in sets[:5])
+                reply = f"Los lanzamientos más recientes de Magic son: {listed}."
+            else:
+                reply = "No pude obtener los lanzamientos desde la API en este momento."
+            payload = {"reply": reply, "sets": sets}
+
         else:  # Intent.CARD_CREATE
             card = self._get_card_builder().build(question)
             step(

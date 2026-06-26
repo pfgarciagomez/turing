@@ -152,6 +152,25 @@ class MTGCardClient:
         cache_path.write_text(json.dumps(cards), encoding="utf-8")
         return cards
 
+    @retry(
+        retry=retry_if_exception(_is_retryable),
+        stop=stop_after_attempt(4),
+        wait=wait_exponential(min=1, max=20),
+    )
+    def _get_sets(self) -> list[dict[str, Any]]:
+        resp = self._client.get(f"{self._base}/sets")
+        resp.raise_for_status()  # dispara backoff ante 429/5xx
+        return resp.json().get("sets", [])
+
+    def get_sets(self) -> list[dict[str, Any]]:
+        """Lista de sets/lanzamientos (con caché en disco; cambian poco)."""
+        cache_path = self._cache_dir / "sets.json"
+        if cache_path.exists():
+            return json.loads(cache_path.read_text(encoding="utf-8"))
+        sets = self._get_sets()
+        cache_path.write_text(json.dumps(sets), encoding="utf-8")
+        return sets
+
 
 def _apply_client_filters(cards: list[dict[str, Any]], filters: CardFilters) -> list[dict[str, Any]]:
     """Filtros que la API no soporta con operadores (rangos de cmc)."""

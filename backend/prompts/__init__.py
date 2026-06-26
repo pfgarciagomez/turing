@@ -39,6 +39,7 @@ ROUTER_SYSTEM = (
     "- 'interaccion_cartas': interacción entre dos o más cartas concretas nombradas.\n"
     "- 'buscar_carta': busca cartas por descripción (color, coste, tipo, subtipo...).\n"
     "- 'crear_carta': pide diseñar/crear una carta custom nueva.\n"
+    "- 'novedades': pregunta por lanzamientos/sets recientes, novedades, qué ha salido nuevo.\n"
     "Devuelve solo el campo 'intent'."
 )
 

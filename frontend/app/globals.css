@@ -483,6 +483,38 @@ body {
   color: var(--parch);
 }
 
+/* Lista de lanzamientos (novedades) */
+.sets {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.set {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 8px 12px;
+  background: var(--ink-700);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--gold);
+  border-radius: 4px;
+}
+.set__name {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--parch);
+}
+.set__meta {
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
 .error {
   color: #ff9b9b;
   font-size: 0.95rem;

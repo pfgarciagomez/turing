@@ -13,6 +13,8 @@ from backend.router import Intent, IntentRouter, heuristic_classify
         ("Quiero una carta de Han Solo, blanca-roja con dañar primero", Intent.CARD_CREATE),
         ("Crea una carta de dragón legendario", Intent.CARD_CREATE),
         ("Si mi rapaz hace daño con daña primero y la cambio con mi ninja, ¿aplico el daño?", Intent.INTERACTION),
+        ("¿Qué lanzamientos o sets han salido recientemente?", Intent.RELEASES),
+        ("Dime las novedades de Magic", Intent.RELEASES),
     ],
 )
 def test_heuristic_classify(text, expected):

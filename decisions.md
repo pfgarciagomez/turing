@@ -37,17 +37,22 @@
   producción ya estarían desacoplados de todos modos (ver doc de arquitectura productiva).
 
 ### 2.2 Router por intención + herramientas
-- Las 4 capacidades del enunciado son **problemas distintos** y cada una pide una técnica distinta:
+- Cada capacidad es un **problema distinto** y pide una técnica distinta:
 
-  | Capacidad | Técnica |
-  |---|---|
-  | Reglas básicas | RAG sobre Comprehensive Rules |
-  | Interacciones entre cartas | lookup de cartas (API) + RAG de reglas + razonamiento |
-  | Búsqueda por descripción | *function calling* → query estructurada a la API |
-  | Crear carta (bonus) | salida JSON estructurada con schema fijo |
+  | Capacidad | Técnica | Fuente |
+  |---|---|---|
+  | Reglas básicas | RAG sobre Comprehensive Rules | PDF (estático) |
+  | Interacciones entre cartas | lookup de cartas (API) + RAG de reglas + razonamiento | PDF + API |
+  | Búsqueda por descripción | *function calling* → query estructurada a la API | API (vivo) |
+  | Crear carta (bonus) | salida JSON estructurada con schema fijo | — (generativo) |
+  | Novedades / lanzamientos | consulta a `/sets` ordenada por fecha (sin LLM, datos factuales) | API (vivo) |
 
 - **Decisión**: un orquestador clasifica la **intención** de la consulta y enruta a la herramienta
   adecuada.
+- **Dos fuentes, dos tratamientos**: el reglamento es **estático** → RAG (se indexa); las cartas y
+  los sets son **dinámicos** (cambian con cada release) → **API en vivo** (no se indexan). Por eso
+  "novedades" consulta `/sets` en tiempo real en vez de embeber nada. Es lo que pide el enunciado:
+  combinar múltiples fuentes y estar al día sin reindexar.
 - **Clave a defender**: la búsqueda por descripción **no es búsqueda semántica**; es traducir
   lenguaje natural a una **query estructurada** (filtros color/cmc/type). *Function calling* encaja
   mejor y es más fiable que embeddings para eso.

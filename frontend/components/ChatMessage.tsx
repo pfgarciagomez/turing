@@ -17,6 +17,7 @@ const INTENT_META: Record<string, { label: string; mana: string }> = {
   interaccion_cartas: { label: "Interacción", mana: "r" },
   buscar_carta: { label: "Búsqueda", mana: "u" },
   crear_carta: { label: "Carta custom", mana: "g" },
+  novedades: { label: "Novedades", mana: "" },
 };
 
 export function ChatMessage({ turn }: { turn: Turn }) {
@@ -33,7 +34,7 @@ export function ChatMessage({ turn }: { turn: Turn }) {
   return (
     <div className="msg msg--bot">
       <div className="bubble bubble--bot">
-        <span className={`intent-tag${meta ? ` intent--${meta.mana}` : ""}`}>
+        <span className={`intent-tag${meta?.mana ? ` intent--${meta.mana}` : ""}`}>
           {meta?.label ?? data.intent}
         </span>
         <p className="reply">{data.reply}</p>
@@ -91,6 +92,20 @@ export function ChatMessage({ turn }: { turn: Turn }) {
           <div className="card-grid">
             <CustomCardView card={data.card} />
           </div>
+        )}
+
+        {data.sets && data.sets.length > 0 && (
+          <ul className="sets">
+            {data.sets.map((s) => (
+              <li key={s.code} className="set">
+                <span className="set__name">{s.name}</span>
+                <span className="set__meta">
+                  {s.code}
+                  {s.releaseDate ? ` · ${s.releaseDate}` : ""}
+                </span>
+              </li>
+            ))}
+          </ul>
         )}
       </div>
     </div>

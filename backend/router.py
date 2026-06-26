@@ -22,6 +22,7 @@ class Intent(str, Enum):
     INTERACTION = "interaccion_cartas"
     CARD_SEARCH = "buscar_carta"
     CARD_CREATE = "crear_carta"
+    RELEASES = "novedades"
 
 
 _INTENT_SCHEMA = {
@@ -32,6 +33,11 @@ _INTENT_SCHEMA = {
 
 # Pistas léxicas para el fallback heurístico (consultas en español).
 _CREATE_RE = re.compile(r"\b(crea|crear|cre[áa]me|dise[ñn]a|gen[ée]rame|invéntate|quiero una carta)\b", re.I)
+_RELEASES_RE = re.compile(
+    r"\b(novedad|novedades|lanzamiento|lanzamientos|nuevos? sets?|[úu]ltimos? sets?|"
+    r"sets? reciente|expansi[óo]n|expansiones|releases?|qu[ée] ha salido)\b",
+    re.I,
+)
 _SEARCH_RE = re.compile(r"\b(busco|busca|búscame|encuentra|enséñame|dame|lista|recomiéndame|cartas?)\b", re.I)
 _INTERACT_RE = re.compile(r"\b(interacci[óo]n|interact[úu]a|combina|si .* (y|con) .*|aplico|bloque[ao]|ataca)\b", re.I)
 
@@ -41,6 +47,8 @@ def heuristic_classify(text: str) -> Intent:
     t = text.lower()
     if _CREATE_RE.search(t):
         return Intent.CARD_CREATE
+    if _RELEASES_RE.search(t):
+        return Intent.RELEASES
     if _INTERACT_RE.search(t):
         return Intent.INTERACTION
     if _SEARCH_RE.search(t):

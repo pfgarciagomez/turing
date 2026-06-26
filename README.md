@@ -13,6 +13,7 @@ Cubre las **4 capacidades** del enunciado:
 | 2 | **Interacciones entre cartas** | lookup de cartas (API) + RAG de reglas + razonamiento | *"¿Cómo interactúa dañar primero con toque mortal?"* |
 | 3 | **Búsqueda por descripción** | *function calling* → query estructurada a la API MTG | *"Carta blanca de coste < 2 que sea guerrero"* |
 | 4 | **Crear carta** (bonus) | salida JSON estructurada (schema fijo) | *"Una carta de Han Solo, blanca-roja, con dañar primero"* |
+| 5 | **Novedades / lanzamientos** | consulta en vivo a `/sets` de la API (datos factuales) | *"¿Qué sets han salido recientemente?"* |
 
 El reto tiene dos apartados: la **implementación** (este sistema) y una **revisión de
 código** (Apartado 2) en [`code_review.md`](code_review.md).
@@ -33,6 +34,7 @@ Usuario (ES)
         interaccion_cartas  → carta(s) API + RAG reglas       → texto + reglas/cartas citadas
         buscar_carta        → function calling → query API MTG → lista de cartas
         crear_carta (bonus) → JSON estructurado               → carta maquetada
+        novedades           → API MTG /sets (en vivo)         → lanzamientos recientes
    ▼
 Respuesta en español + fuentes citadas
 ```
@@ -43,7 +45,8 @@ Respuesta en español + fuentes citadas
 - **Embeddings**: **locales** (`intfloat/multilingual-e5-base`), cross-lingual ES↔EN —
   ver [`decisions.md` §2.3](decisions.md) sobre por qué no Gemini embeddings.
 - **Vector store**: **Chroma** persistente en disco.
-- **Datos de cartas**: API `magicthegathering.io` con caché en disco + backoff.
+- **Datos de cartas y sets**: API `magicthegathering.io` (`/cards` y `/sets`) en vivo, con
+  caché en disco + backoff. Es la fuente **dinámica** (complementa al reglamento estático).
 
 El detalle de cómo escalaría a producción (servicios, agentes, observabilidad, guardrails,
 feedback loop, CI/CD) está en **[`ARCHITECTURE.md`](ARCHITECTURE.md)**.
@@ -139,6 +142,7 @@ backend/
     interactions.py capacidad 2 (cartas + reglas)
     card_search.py  capacidad 3 (function calling + API MTG)
     card_builder.py capacidad 4 / bonus (JSON estructurado)
+    releases.py     capacidad 5 (novedades: API /sets en vivo)
 frontend/           Next.js (App Router) + React
 tests/              pytest
 decisions.md        Documento de Decisiones Técnicas (DDT)

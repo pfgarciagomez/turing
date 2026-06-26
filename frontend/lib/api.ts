@@ -34,6 +34,15 @@ export interface Source {
   score: number; // similitud coseno (mayor = más relevante)
 }
 
+// Set/lanzamiento devuelto por la API MTG (capacidad de novedades).
+export interface SetInfo {
+  code: string;
+  name: string;
+  type?: string;
+  releaseDate?: string;
+  block?: string;
+}
+
 export interface CustomCard {
   name: string;
   mana_cost: string;
@@ -53,6 +62,7 @@ export interface ChatResponse {
   sources?: Source[];
   cards?: MtgCard[];
   card?: CustomCard;
+  sets?: SetInfo[];
   filters?: Record<string, unknown>;
 }
 
