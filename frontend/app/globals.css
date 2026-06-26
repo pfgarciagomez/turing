@@ -133,35 +133,48 @@ body {
   flex-direction: column;
   gap: 18px;
 }
+/* Sin mensajes: centra el hero en el espacio disponible (no apelmazado arriba). */
+.chat--empty {
+  justify-content: center;
+}
 
 /* Hero / estado inicial: lo más característico del mundo MTG, los pips */
 .hero {
-  margin: 32px 0;
   text-align: center;
   color: var(--parch-dim);
+  padding: 24px 0;
 }
 .hero__pips {
   display: flex;
   justify-content: center;
-  gap: 12px;
-  margin-bottom: 22px;
+  gap: 16px;
+  margin-bottom: 10px;
 }
 .hero__pips .pip {
-  width: 34px;
-  height: 34px;
-  font-size: 0.85rem;
+  width: 42px;
+  height: 42px;
+  font-size: 1rem;
+}
+.hero__caption {
+  font-family: var(--font-display);
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--gold);
+  margin: 0 0 28px;
 }
 .hero__title {
   font-family: var(--font-display);
-  font-size: 1.35rem;
-  letter-spacing: 0.04em;
+  font-size: 1.7rem;
+  letter-spacing: 0.05em;
   color: var(--parch);
-  margin: 0 0 10px;
+  margin: 0 0 14px;
 }
 .hero__text {
-  max-width: 30rem;
+  max-width: 34rem;
   margin: 0 auto;
-  font-size: 1.05rem;
+  font-size: 1.12rem;
+  line-height: 1.65;
 }
 
 .msg {
@@ -463,13 +476,13 @@ body {
 /* ---------- Sugerencias siempre visibles --------------------------------- */
 .suggestions-bar {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 10px;
-  overflow-x: auto;
   padding: 12px 0 6px;
-  scrollbar-width: thin;
 }
 .suggestion-chip {
-  flex: 0 0 auto;
+  flex: 1 1 200px;
   max-width: 270px;
   display: flex;
   flex-direction: column;

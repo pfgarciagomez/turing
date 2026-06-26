@@ -79,12 +79,13 @@ export default function Home() {
         </div>
       </header>
 
-      <section className="chat">
+      <section className={`chat${turns.length === 0 ? " chat--empty" : ""}`}>
         {turns.length === 0 && (
           <div className="hero">
             <div className="hero__pips">
               <ManaPips />
             </div>
+            <p className="hero__caption">Los cinco colores del maná</p>
             <p className="hero__title">Consulta el reglamento</p>
             <p className="hero__text">
               Reglas, interacciones entre cartas, búsqueda por descripción y diseño de cartas.
