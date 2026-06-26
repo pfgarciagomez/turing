@@ -51,12 +51,14 @@ def _by_id(chunks: list[RuleChunk]) -> dict[str, RuleChunk]:
 
 
 def test_extracts_expected_rule_ids():
+    """Extrae los IDs de regla esperados (100.1, 100.1a, 509.1...)."""
     chunks = chunk_rules_text(SAMPLE)
     rule_ids = {c.rule_id for c in chunks if c.type == "rule"}
     assert rule_ids == {"100.1", "100.1a", "100.1b", "100.2", "509.1", "509.1a"}
 
 
 def test_section_metadata_is_first_digit():
+    """La sección de cada chunk es el primer dígito del nº de regla."""
     by_id = _by_id(chunk_rules_text(SAMPLE))
     assert by_id["100.1"].section == "1"
     assert by_id["100.1a"].section == "1"
@@ -64,6 +66,7 @@ def test_section_metadata_is_first_digit():
 
 
 def test_rule_body_excludes_id_and_joins_continuation_lines():
+    """El cuerpo excluye el ID y une las líneas de continuación."""
     by_id = _by_id(chunk_rules_text(SAMPLE))
     # El id no debe quedar dentro del texto (viaja como metadato/fuente).
     assert by_id["100.1"].text.startswith("These Magic rules apply")
@@ -73,6 +76,7 @@ def test_rule_body_excludes_id_and_joins_continuation_lines():
 
 
 def test_section_and_group_headers_do_not_create_chunks():
+    """Las cabeceras de sección/grupo no generan chunks (solo reglas)."""
     chunks = chunk_rules_text(SAMPLE)
     texts = [c.text for c in chunks]
     assert "Game Concepts" not in texts
@@ -81,6 +85,7 @@ def test_section_and_group_headers_do_not_create_chunks():
 
 
 def test_glossary_entries_parsed_with_type():
+    """Las entradas del glosario se indexan con type=glossary."""
     by_id = _by_id(chunk_rules_text(SAMPLE))
     assert by_id["First Strike"].type == "glossary"
     assert by_id["First Strike"].section == "glossary"
@@ -89,6 +94,7 @@ def test_glossary_entries_parsed_with_type():
 
 
 def test_credits_section_stops_glossary():
+    """La sección Credits corta el glosario y no se indexa."""
     by_id = _by_id(chunk_rules_text(SAMPLE))
     # "Credits" no debe convertirse en una entrada de glosario.
     assert "Credits" not in by_id
@@ -96,6 +102,7 @@ def test_credits_section_stops_glossary():
 
 
 def test_store_ids_are_unique_and_idempotent():
+    """Los store_id son únicos y estables al reparsear (ingesta idempotente)."""
     chunks = chunk_rules_text(SAMPLE)
     ids = [c.store_id for c in chunks]
     assert len(ids) == len(set(ids))  # sin colisiones
@@ -104,11 +111,12 @@ def test_store_ids_are_unique_and_idempotent():
 
 
 def test_empty_input_returns_no_chunks():
+    """Entrada vacía -> ningún chunk."""
     assert chunk_rules_text("") == []
 
 
 def test_rule_with_trailing_period_id_is_normalized():
-    # "100.1." debe dar id "100.1" (sin el punto final).
+    """Normaliza el ID con punto final: '100.1.' -> '100.1'."""
     by_id = _by_id(chunk_rules_text(SAMPLE))
     assert "100.1." not in by_id
     assert "100.1" in by_id

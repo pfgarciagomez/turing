@@ -16,10 +16,12 @@ from backend.router import Intent, IntentRouter, heuristic_classify
     ],
 )
 def test_heuristic_classify(text, expected):
+    """La heurística por palabras clave clasifica cada frase en su intención."""
     assert heuristic_classify(text) == expected
 
 
 def test_router_uses_llm_when_available():
+    """Cuando hay LLM, el router usa su clasificación estructurada."""
     class FakeLLM:
         def extract_json(self, system, text, schema, temperature=0.0):
             return {"intent": "buscar_carta"}
@@ -29,6 +31,7 @@ def test_router_uses_llm_when_available():
 
 
 def test_router_falls_back_to_heuristic_on_llm_error():
+    """Si el LLM falla (p. ej. 429), cae a la heurística sin romperse."""
     class BrokenLLM:
         def extract_json(self, *a, **k):
             raise RuntimeError("cuota agotada (429)")
@@ -39,5 +42,6 @@ def test_router_falls_back_to_heuristic_on_llm_error():
 
 
 def test_router_can_skip_llm_entirely():
+    """Con use_llm=False clasifica sin tocar el LLM (testeable offline)."""
     router = IntentRouter(use_llm=False)  # nunca toca el LLM
     assert router.classify("¿Cómo funciona el maná?") == Intent.RULES

@@ -26,6 +26,7 @@ def _client(tmp_path) -> MTGCardClient:
 
 
 def test_build_query_params_maps_filters():
+    """Mapea los filtros estructurados a parámetros de la API."""
     params = build_query_params(
         CardFilters(colors=["W"], subtypes=["Warrior"], cmc=1, page_size=10)
     )
@@ -36,18 +37,21 @@ def test_build_query_params_maps_filters():
 
 
 def test_build_query_params_joins_multiple_values():
+    """Une varios valores con coma (colors=W,R)."""
     params = build_query_params(CardFilters(colors=["W", "R"], types=["Creature"]))
     assert params["colors"] == "W,R"
     assert params["types"] == "Creature"
 
 
 def test_cmc_max_is_filtered_client_side():
+    """cmc_max se aplica en cliente, estricto (< N)."""
     cards = [{"name": "A", "cmc": 1}, {"name": "B", "cmc": 2}, {"name": "C", "cmc": 3}]
     out = _apply_client_filters(cards, CardFilters(cmc_max=2))
     assert [c["name"] for c in out] == ["A"]  # estricto: < 2
 
 
 def test_cmc_min_is_filtered_client_side():
+    """cmc_min se aplica en cliente (>= N)."""
     cards = [{"name": "A", "cmc": 1}, {"name": "B", "cmc": 2}, {"name": "C", "cmc": 3}]
     out = _apply_client_filters(cards, CardFilters(cmc_min=2))
     assert [c["name"] for c in out] == ["B", "C"]
@@ -55,6 +59,7 @@ def test_cmc_min_is_filtered_client_side():
 
 @respx.mock
 def test_search_uses_cache_on_second_call(tmp_path):
+    """La 2ª búsqueda idéntica se sirve de la caché (no repite el HTTP)."""
     route = respx.get(CARDS_URL).mock(
         return_value=httpx.Response(200, json={"cards": [{"name": "X", "cmc": 1}]})
     )
@@ -70,6 +75,7 @@ def test_search_uses_cache_on_second_call(tmp_path):
 
 @respx.mock
 def test_search_applies_white_warrior_and_cmc_max(tmp_path):
+    """Caso real del enunciado: guerrero blanco con coste < 2."""
     respx.get(CARDS_URL).mock(
         return_value=httpx.Response(
             200,
@@ -84,6 +90,7 @@ def test_search_applies_white_warrior_and_cmc_max(tmp_path):
 
 
 def test_filters_drop_sentinel_strings():
+    """Neutraliza los centinelas 'null'/'none' que mete el LLM (regresión)."""
     # El LLM a veces rellena campos opcionales con "null"/"none" en vez de omitirlos;
     # el validador los neutraliza para que no contaminen la query (regresión real).
     f = CardFilters.model_validate(
@@ -95,6 +102,7 @@ def test_filters_drop_sentinel_strings():
 
 
 def test_is_retryable_classification():
+    """Solo son reintentables los errores transitorios (429/5xx/red), no los 4xx."""
     assert _is_retryable(httpx.ConnectError("boom")) is True
     resp429 = httpx.Response(429, request=httpx.Request("GET", CARDS_URL))
     resp503 = httpx.Response(503, request=httpx.Request("GET", CARDS_URL))

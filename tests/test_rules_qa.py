@@ -33,12 +33,14 @@ HIT = Retrieved(rule_id="106.1", section="1", type="rule", text="Mana is the pri
 
 
 def test_build_context_keeps_source_per_chunk():
+    """El contexto conserva la fuente (nº de regla) de cada chunk."""
     ctx = build_context([HIT])
     assert "[fuente: 106.1]" in ctx
     assert "Mana is the primary resource." in ctx
 
 
 def test_answer_grounds_context_and_returns_sources():
+    """Funda la respuesta en el contexto recuperado y devuelve sus fuentes."""
     llm = CapturingLLM()
     qa = RulesQA(retriever=FakeRetriever([HIT]), llm=llm)
     result = qa.answer("¿Cómo funciona el maná?")
@@ -54,6 +56,7 @@ def test_answer_grounds_context_and_returns_sources():
 
 
 def test_empty_retrieval_says_no_context_and_skips_llm():
+    """Sin reglas recuperadas: responde 'no hay contexto' y no llama al LLM."""
     llm = CapturingLLM()
     qa = RulesQA(retriever=FakeRetriever([]), llm=llm)
     result = qa.answer("pregunta sin reglas relevantes")
@@ -64,6 +67,7 @@ def test_empty_retrieval_says_no_context_and_skips_llm():
 
 
 def test_history_is_prepended_before_current_question():
+    """El historial se antepone; la pregunta actual (con contexto) va al final."""
     llm = CapturingLLM()
     qa = RulesQA(retriever=FakeRetriever([HIT]), llm=llm)
     history = [
