@@ -1,6 +1,6 @@
 """Router de intención: clasifica la consulta y la enruta a la herramienta adecuada.
 
-Las 4 capacidades del enunciado son problemas distintos (ver decisions.md §2.2).
+Cada capacidad del enunciado es un problema distinto (ver decisions.md §2.2).
 El router decide cuál aplicar. Estrategia: **LLM-first con fallback heurístico**:
   - Primero intenta una clasificación estructurada con el LLM (más robusta ante
     lenguaje natural variado).

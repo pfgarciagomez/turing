@@ -5,7 +5,7 @@ español** y **cita siempre su fuente** (nº de regla del reglamento oficial o t
 carta), porque en un call center importa más que la respuesta sea **trazable y defendible**
 que "acertar" un ruling de memoria.
 
-Cubre las **4 capacidades** del enunciado:
+Cubre las capacidades del enunciado (4 + una ampliación de novedades):
 
 | # | Capacidad | Técnica | Ejemplo |
 |---|---|---|---|
@@ -114,12 +114,12 @@ curl -X POST http://localhost:8000/chat \
 ## Tests
 
 ```bash
-pytest            # 35 tests; deterministas (no llaman al LLM ni a la API real)
+pytest            # 40 tests; deterministas (no llaman al LLM ni a la API real)
 ```
 
 Cubren chunking del reglamento, construcción de la query de cartas + filtrado en cliente +
-caché (HTTP mockeado con `respx`), memoria de sesión, router de intención y el grounding del
-RAG de reglas.
+caché (HTTP mockeado con `respx`), memoria de sesión, router de intención, novedades (orden
+de sets) y el grounding del RAG de reglas.
 
 ---
 

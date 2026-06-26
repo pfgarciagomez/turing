@@ -78,7 +78,7 @@
   (p. ej. "702.118 Skulk", "205.2 Card Types"); su definición real está en la sub-regla (702.118a…).
   Estos chunks de 1-2 palabras contaminaban el retrieval de consultas cortas. Pasamos de 3.868 a 3.608.
 
-### 2.5 Métrica coseno + parámetros de recuperación (`top_k=10`, umbral `0.25`)
+### 2.5 Métrica coseno + parámetros de recuperación (`top_k=20`, umbral `0.7`)
 - **Métrica: coseno explícito.** La colección de Chroma se crea con
   `metadata={"hnsw:space": "cosine"}`. e5 se **entrena con similitud coseno**, así que es la
   métrica natural. (Antes usábamos la L2 por defecto de Chroma sobre vectores normalizados, que
@@ -95,9 +95,9 @@
 - **Garantía**: si *todo* supera el umbral, se conserva el **mejor resultado** (top-1) para no
   quedarse sin contexto en consultas límite; la capa RAG ya maneja el caso de 0 resultados.
 - **Cambiar la métrica obliga a reingestar** (el espacio se fija al crear la colección).
-- **Pendiente de producción**: afinar el umbral con el *golden set* (Recall@k), no a ojo.
+- **Mejora futura (producción)**: afinar el umbral con el *golden set* (Recall@k), no a ojo.
 
-## 3. Decisiones pendientes / por documentar
+## 3. Decisiones documentadas (checklist)
 - [x] Chunking por nº de regla + glosario + filtro de cabeceras (§2.4).
 - [x] Metadatos de chunk: `{rule_id, section, type}`.
 - [x] Embeddings: locales e5 (§2.3); chat Gemini 2.5-flash.
@@ -109,6 +109,9 @@
 - [x] Robustez de extracción de filtros: el LLM a veces devuelve `"null"`/`"none"` en
   campos opcionales → un validador en `CardFilters` los neutraliza (si no, `rarity="null"`
   contaminaba la query y devolvía 0 resultados).
+- [x] Métrica coseno explícita + parámetros de recuperación (`top_k=20`, umbral `0.7`) (§2.5).
+- [x] Dos fuentes (reglamento estático → RAG; cartas/sets dinámicos → API en vivo) y capacidad
+  de novedades vía `/sets` (§2.2).
 
 ## 4. Qué simplificamos por tiempo (y cómo iría en producción)
 - Caché de la API en disco/memoria → en prod, Redis con TTL.

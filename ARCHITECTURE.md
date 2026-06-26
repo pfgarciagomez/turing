@@ -134,8 +134,9 @@ El enunciado pide "agentes". Aquí el patrón es **router + herramientas especia
 | **Interacciones** | lookup de cartas (API) + RAG de reglas + razonamiento | regla + carta |
 | **Búsqueda** | *function calling* → query estructurada a la API | cartas devueltas |
 | **Crear carta** (bonus) | salida JSON estructurada con schema fijo | — (generativo) |
+| **Novedades** | consulta en vivo a `/sets` (sin LLM, datos factuales) | sets de la API |
 
-**Por qué router y no un único agente autónomo**: dominio cerrado y 4 intenciones bien
+**Por qué router y no un único agente autónomo**: dominio cerrado e intenciones bien
 definidas. Un router es **predecible, testeable y barato** (1 clasificación + 1 herramienta
 vs. múltiples vueltas de razonamiento). El fallback heurístico garantiza respuesta aunque el
 LLM falle. Si el catálogo de capacidades creciera mucho, se evolucionaría a un planner/agente
