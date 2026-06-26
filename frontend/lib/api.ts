@@ -31,7 +31,7 @@ export interface Source {
   section: string;
   type: string; // "rule" | "glossary"
   text: string;
-  score: number; // distancia (menor = más relevante)
+  score: number; // similitud coseno (mayor = más relevante)
 }
 
 export interface CustomCard {

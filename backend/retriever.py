@@ -21,7 +21,7 @@ class Retrieved:
     section: str  # "1".."9" o "glossary"
     type: str  # "rule" | "glossary"
     text: str
-    score: float  # distancia (menor = más relevante)
+    score: float  # similitud coseno (mayor = más relevante)
 
 
 class RulesRetriever:
@@ -42,17 +42,17 @@ class RulesRetriever:
         self,
         query: str,
         top_k: int | None = None,
-        max_distance: float | None = None,
+        min_similarity: float | None = None,
     ) -> list[Retrieved]:
         """Top-k reglas más relevantes para la consulta (en ES o EN).
 
-        Recupera `top_k` candidatos y descarta los que superen `max_distance`
+        Recupera `top_k` candidatos y descarta los de similitud < `min_similarity`
         (ruido poco relevante). Conserva siempre al menos el mejor resultado para
         no quedarse mudo en consultas límite; quien llama decide si es suficiente.
         """
         top_k = top_k or self._settings.rag_top_k
-        if max_distance is None:
-            max_distance = self._settings.rag_max_distance
+        if min_similarity is None:
+            min_similarity = self._settings.rag_min_similarity
         q_emb = self._embedder.embed_query(query)
         res = self._collection.query(
             query_embeddings=[q_emb],
@@ -64,17 +64,18 @@ class RulesRetriever:
             return []
         metadatas = (res.get("metadatas") or [[]])[0]
         distances = (res.get("distances") or [[]])[0]
-        # Chroma devuelve los resultados ordenados por distancia ascendente.
+        # Chroma devuelve la distancia coseno (menor = mejor) ordenada ascendente;
+        # la convertimos a similitud (1 - distancia) para que mayor = más relevante.
         hits = [
             Retrieved(
                 rule_id=(meta or {}).get("rule_id", "?"),
                 section=(meta or {}).get("section", "?"),
                 type=(meta or {}).get("type", "rule"),
                 text=doc,
-                score=float(dist),
+                score=1.0 - float(dist),
             )
             for doc, meta, dist in zip(documents, metadatas, distances)
         ]
-        relevant = [h for h in hits if h.score <= max_distance]
-        # Si todo supera el umbral, conserva el mejor (el primero) como mínimo.
+        relevant = [h for h in hits if h.score >= min_similarity]
+        # Si ninguno alcanza el umbral, conserva el mejor (el primero) como mínimo.
         return relevant or hits[:1]

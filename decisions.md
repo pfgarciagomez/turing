@@ -78,13 +78,14 @@
   `metadata={"hnsw:space": "cosine"}`. e5 se **entrena con similitud coseno**, así que es la
   métrica natural. (Antes usábamos la L2 por defecto de Chroma sobre vectores normalizados, que
   es *equivalente en ranking* —L2² = 2·(1−cos)— pero dejarlo explícito es más limpio y no depende
-  de esa equivalencia implícita.) El `score` es la **distancia coseno** = `1 − similitud`.
+  de esa equivalencia implícita.) Chroma devuelve **distancia coseno**; el retriever la convierte
+  a **similitud** = `1 − distancia` (mayor = más relevante), que es más intuitivo de exponer.
 - **`top_k=10` (antes 6)**: como troceamos por nº de regla, muchos chunks son muy breves (una
   sola sub-regla). Más candidatos = contexto suficiente en preguntas que dependen de varias
   sub-reglas (p. ej. combate), con coste de tokens asumible en Flash.
-- **Umbral `rag_max_distance=0.25`**: es un **máximo de distancia**, no un mínimo de similitud
-  (menor distancia = más relevante). Las buenas coincidencias caen en **~0.18–0.22**; 0.25 deja
-  pasar lo relevante y corta el ruido.
+- **Umbral `rag_min_similarity=0.4`**: es un **mínimo de similitud** (mayor = más relevante). Las
+  buenas coincidencias caen en **~0.78–0.82**; 0.4 es deliberadamente **permisivo** (red de
+  seguridad anti-ruido), apoyándose en el grounding del prompt para ignorar lo poco relevante.
 - **Garantía**: si *todo* supera el umbral, se conserva el **mejor resultado** (top-1) para no
   quedarse sin contexto en consultas límite; la capa RAG ya maneja el caso de 0 resultados.
 - **Cambiar la métrica obliga a reingestar** (el espacio se fija al crear la colección).

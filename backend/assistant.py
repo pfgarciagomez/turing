@@ -143,11 +143,11 @@ class Assistant:
             res = self._get_rules_qa().answer(question, history)
             srcs = res.sources
             if srcs:
-                best = min(srcs, key=lambda r: r.score)
+                best = max(srcs, key=lambda r: r.score)
                 step(
                     "Recuperación semántica (RAG · Chroma)",
                     f"Embedding de la consulta y búsqueda top-{len(srcs)} en el reglamento · "
-                    f"mejor coincidencia: regla {best.rule_id} (distancia {best.score:.3f})",
+                    f"mejor coincidencia: regla {best.rule_id} (similitud {best.score:.3f})",
                 )
             else:
                 step("Recuperación semántica (RAG · Chroma)", "Sin fragmentos relevantes")

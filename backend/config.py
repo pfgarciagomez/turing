@@ -42,9 +42,9 @@ class Settings(BaseSettings):
 
     # --- RAG ---
     rag_top_k: int = 10  # nº de chunks recuperados (algunos son cortos: 1 regla = 1 chunk)
-    # Umbral de distancia COSENO (1 - similitud): descarta chunks con dist > umbral.
-    # Buenas coincidencias ≈ 0.18-0.22; 0.25 deja pasar lo relevante y corta el ruido.
-    rag_max_distance: float = 0.25
+    # Umbral de SIMILITUD coseno (mayor = más relevante): descarta chunks con sim < umbral.
+    # Buenas coincidencias ≈ 0.78-0.82; 0.4 es muy permisivo (red de seguridad anti-ruido).
+    rag_min_similarity: float = 0.4
 
     # --- Memoria de conversación ---
     memory_max_turns: int = 6  # turnos previos que conserva la ventana deslizante

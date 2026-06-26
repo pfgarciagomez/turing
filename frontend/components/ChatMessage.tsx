@@ -64,7 +64,7 @@ export function ChatMessage({ turn }: { turn: Turn }) {
                   <summary className="source__summary">
                     <span className="chip">{s.rule_id}</span>
                     <span className="source__meta">
-                      {s.type === "glossary" ? "glosario" : `sección ${s.section}`} · dist{" "}
+                      {s.type === "glossary" ? "glosario" : `sección ${s.section}`} · sim{" "}
                       {s.score.toFixed(3)}
                     </span>
                   </summary>
