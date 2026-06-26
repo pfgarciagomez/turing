@@ -18,6 +18,13 @@ export interface MtgCard {
   [k: string]: unknown;
 }
 
+// Un paso de lo que hizo el backend (router, RAG, API, LLM...) para esta petición.
+export interface TraceStep {
+  label: string;
+  detail: string;
+  ms?: number; // duración de la fase, si se midió
+}
+
 // Chunk recuperado del reglamento, con su texto para poder expandirlo en el front.
 export interface Source {
   rule_id: string;
@@ -42,6 +49,7 @@ export interface CustomCard {
 export interface ChatResponse {
   intent: Intent;
   reply: string;
+  trace?: TraceStep[];
   sources?: Source[];
   cards?: MtgCard[];
   card?: CustomCard;

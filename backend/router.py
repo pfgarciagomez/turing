@@ -62,11 +62,16 @@ class IntentRouter:
         return self._llm
 
     def classify(self, text: str) -> Intent:
+        return self.classify_traced(text)[0]
+
+    def classify_traced(self, text: str) -> tuple[Intent, str]:
+        """Como `classify`, pero devuelve también el método usado ('LLM' /
+        'heurística'), para poder mostrar la traza de lo que hizo el backend."""
         if self._use_llm:
             try:
                 raw = self._ensure_llm().extract_json(ROUTER_SYSTEM, text, _INTENT_SCHEMA)
-                return Intent(raw["intent"])
+                return Intent(raw["intent"]), "LLM"
             except Exception:
                 # Cualquier fallo (cuota, red, JSON inesperado) -> heurística.
-                pass
-        return heuristic_classify(text)
+                return heuristic_classify(text), "heurística (fallback)"
+        return heuristic_classify(text), "heurística"

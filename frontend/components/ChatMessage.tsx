@@ -34,6 +34,25 @@ export function ChatMessage({ turn }: { turn: Turn }) {
         <span className="intent-tag">{INTENT_LABEL[data.intent] ?? data.intent}</span>
         <p className="reply">{data.reply}</p>
 
+        {data.trace && data.trace.length > 0 && (
+          <details className="trace">
+            <summary className="trace__summary">
+              ⚙️ Cómo se generó esta respuesta ({data.trace.length} pasos)
+            </summary>
+            <ol className="trace__list">
+              {data.trace.map((t, i) => (
+                <li key={i} className="trace__step">
+                  <div className="trace__head">
+                    <span className="trace__label">{t.label}</span>
+                    {typeof t.ms === "number" && <span className="trace__ms">{t.ms} ms</span>}
+                  </div>
+                  <span className="trace__detail">{t.detail}</span>
+                </li>
+              ))}
+            </ol>
+          </details>
+        )}
+
         {data.sources && data.sources.length > 0 && (
           <div className="sources">
             <span className="sources__label">

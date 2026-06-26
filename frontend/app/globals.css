@@ -181,6 +181,81 @@ body {
   white-space: pre-wrap;
 }
 
+/* Panel de traza: qué hizo el backend (router → tools → LLM) paso a paso. */
+.trace {
+  margin-top: 12px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.trace__summary {
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: var(--muted);
+  list-style: none;
+  user-select: none;
+}
+.trace__summary::-webkit-details-marker {
+  display: none;
+}
+.trace__summary:hover {
+  color: var(--text);
+}
+.trace__list {
+  margin: 0;
+  padding: 4px 10px 10px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  counter-reset: trace;
+}
+.trace__step {
+  position: relative;
+  list-style: none;
+}
+.trace__step::before {
+  counter-increment: trace;
+  content: counter(trace);
+  position: absolute;
+  left: -22px;
+  top: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.trace__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.trace__label {
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.trace__ms {
+  font-size: 0.68rem;
+  font-family: ui-monospace, monospace;
+  color: var(--accent);
+  background: rgba(108, 140, 255, 0.12);
+  border: 1px solid rgba(108, 140, 255, 0.3);
+  padding: 0 6px;
+  border-radius: 999px;
+}
+.trace__detail {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
 .card-grid {
   margin-top: 12px;
   display: grid;
