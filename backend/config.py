@@ -41,10 +41,10 @@ class Settings(BaseSettings):
     mtg_cache_dir: str = "data/cache"
 
     # --- RAG ---
-    rag_top_k: int = 10  # nº de chunks recuperados (algunos son cortos: 1 regla = 1 chunk)
+    rag_top_k: int = 20  # nº de chunks recuperados (algunos son cortos: 1 regla = 1 chunk)
     # Umbral de SIMILITUD coseno (mayor = más relevante): descarta chunks con sim < umbral.
-    # Buenas coincidencias ≈ 0.78-0.82; 0.6 corta el ruido sin perder lo relevante.
-    rag_min_similarity: float = 0.6
+    # Buenas coincidencias ≈ 0.78-0.82; 0.7 es estricto sin llegar a vaciar el contexto.
+    rag_min_similarity: float = 0.7
 
     # --- Memoria de conversación ---
     memory_max_turns: int = 6  # turnos previos que conserva la ventana deslizante

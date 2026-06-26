@@ -80,12 +80,13 @@
   es *equivalente en ranking* —L2² = 2·(1−cos)— pero dejarlo explícito es más limpio y no depende
   de esa equivalencia implícita.) Chroma devuelve **distancia coseno**; el retriever la convierte
   a **similitud** = `1 − distancia` (mayor = más relevante), que es más intuitivo de exponer.
-- **`top_k=10` (antes 6)**: como troceamos por nº de regla, muchos chunks son muy breves (una
+- **`top_k=20` (antes 6)**: como troceamos por nº de regla, muchos chunks son muy breves (una
   sola sub-regla). Más candidatos = contexto suficiente en preguntas que dependen de varias
   sub-reglas (p. ej. combate), con coste de tokens asumible en Flash.
-- **Umbral `rag_min_similarity=0.6`**: es un **mínimo de similitud** (mayor = más relevante). Las
-  buenas coincidencias caen en **~0.78–0.82**; 0.6 corta el ruido sin perder lo relevante (apoyado
-  además en el grounding del prompt, que ignora lo poco pertinente).
+- **Umbral `rag_min_similarity=0.7`**: es un **mínimo de similitud** (mayor = más relevante). Las
+  buenas coincidencias caen en **~0.78–0.82** (el retrieval cross-lingual ES→EN comprime la
+  similitud, así que no suben más); 0.7 es estricto pero **sin vaciar el contexto**. Un valor ≥0.8
+  dejaría fuera incluso los aciertos. Apoyado además en el grounding del prompt.
 - **Garantía**: si *todo* supera el umbral, se conserva el **mejor resultado** (top-1) para no
   quedarse sin contexto en consultas límite; la capa RAG ya maneja el caso de 0 resultados.
 - **Cambiar la métrica obliga a reingestar** (el espacio se fija al crear la colección).
