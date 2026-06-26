@@ -73,6 +73,19 @@
   (p. ej. "702.118 Skulk", "205.2 Card Types"); su definición real está en la sub-regla (702.118a…).
   Estos chunks de 1-2 palabras contaminaban el retrieval de consultas cortas. Pasamos de 3.868 a 3.608.
 
+### 2.5 Parámetros de recuperación: `top_k=10` + umbral de distancia `0.7`
+- **Decisión**: recuperar **10 chunks** y descartar los de **distancia > 0.7** (`rag_max_distance`).
+- **Por qué `top_k=10` (antes 6)**: como troceamos por nº de regla, muchos chunks son muy
+  breves (una sola sub-regla). Recuperar más candidatos da contexto suficiente en preguntas que
+  dependen de varias sub-reglas (p. ej. combate), con coste de tokens asumible en Flash.
+- **Por qué un umbral de distancia (no de "score mínimo")**: el `score` es una **distancia**
+  (L2 sobre vectores normalizados): **menor = más relevante**. Las buenas coincidencias caen en
+  **~0.37–0.42**; el ruido, por encima de ~0.6. Por eso el corte es un **máximo** de distancia,
+  no un mínimo de similitud. Valor **0.7** (permisivo) para no perder coincidencias válidas.
+- **Garantía**: si *todo* supera el umbral, se conserva el **mejor resultado** (top-1) para no
+  quedarse sin contexto en consultas límite; la capa RAG ya maneja el caso de 0 resultados.
+- **Pendiente de producción**: afinar el umbral con el *golden set* (Recall@k), no a ojo.
+
 ## 3. Decisiones pendientes / por documentar
 - [x] Chunking por nº de regla + glosario + filtro de cabeceras (§2.4).
 - [x] Metadatos de chunk: `{rule_id, section, type}`.

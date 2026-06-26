@@ -41,7 +41,11 @@ class Settings(BaseSettings):
     mtg_cache_dir: str = "data/cache"
 
     # --- RAG ---
-    rag_top_k: int = 6
+    rag_top_k: int = 10  # nº de chunks recuperados (algunos son cortos: 1 regla = 1 chunk)
+    rag_max_distance: float = 0.7  # descarta ruido: distancia > umbral (menor = más relevante)
+
+    # --- Memoria de conversación ---
+    memory_max_turns: int = 6  # turnos previos que conserva la ventana deslizante
 
     def require_api_key(self) -> str:
         """Devuelve la key o lanza un error claro si falta (solo al usar el LLM)."""

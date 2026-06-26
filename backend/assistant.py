@@ -124,7 +124,7 @@ class Assistant:
                 entry["ms"] = round((time.perf_counter() - since) * 1000)
             trace.append(entry)
 
-        memory = SessionMemory(session_id, max_turns=self._settings.rag_top_k)
+        memory = SessionMemory(session_id, max_turns=self._settings.memory_max_turns)
         history = memory.messages
         prev_turns = len(history) // 2
         step(

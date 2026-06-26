@@ -38,9 +38,21 @@ class RulesRetriever:
         # get_collection (no create): si no existe, es que falta la ingesta.
         self._collection = client.get_collection(self._settings.chroma_collection)
 
-    def search(self, query: str, top_k: int | None = None) -> list[Retrieved]:
-        """Top-k reglas más relevantes para la consulta (en ES o EN)."""
+    def search(
+        self,
+        query: str,
+        top_k: int | None = None,
+        max_distance: float | None = None,
+    ) -> list[Retrieved]:
+        """Top-k reglas más relevantes para la consulta (en ES o EN).
+
+        Recupera `top_k` candidatos y descarta los que superen `max_distance`
+        (ruido poco relevante). Conserva siempre al menos el mejor resultado para
+        no quedarse mudo en consultas límite; quien llama decide si es suficiente.
+        """
         top_k = top_k or self._settings.rag_top_k
+        if max_distance is None:
+            max_distance = self._settings.rag_max_distance
         q_emb = self._embedder.embed_query(query)
         res = self._collection.query(
             query_embeddings=[q_emb],
@@ -52,7 +64,8 @@ class RulesRetriever:
             return []
         metadatas = (res.get("metadatas") or [[]])[0]
         distances = (res.get("distances") or [[]])[0]
-        return [
+        # Chroma devuelve los resultados ordenados por distancia ascendente.
+        hits = [
             Retrieved(
                 rule_id=(meta or {}).get("rule_id", "?"),
                 section=(meta or {}).get("section", "?"),
@@ -62,3 +75,6 @@ class RulesRetriever:
             )
             for doc, meta, dist in zip(documents, metadatas, distances)
         ]
+        relevant = [h for h in hits if h.score <= max_distance]
+        # Si todo supera el umbral, conserva el mejor (el primero) como mínimo.
+        return relevant or hits[:1]
