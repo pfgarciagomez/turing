@@ -11,11 +11,12 @@ export interface BotTurn {
 }
 export type Turn = UserTurn | BotTurn;
 
-const INTENT_LABEL: Record<string, string> = {
-  reglas_basicas: "Reglas",
-  interaccion_cartas: "Interacción",
-  buscar_carta: "Búsqueda",
-  crear_carta: "Carta custom",
+// Cada capacidad se asocia a un color de maná (su identidad visual).
+const INTENT_META: Record<string, { label: string; mana: string }> = {
+  reglas_basicas: { label: "Reglas", mana: "w" },
+  interaccion_cartas: { label: "Interacción", mana: "r" },
+  buscar_carta: { label: "Búsqueda", mana: "u" },
+  crear_carta: { label: "Carta custom", mana: "g" },
 };
 
 export function ChatMessage({ turn }: { turn: Turn }) {
@@ -28,10 +29,13 @@ export function ChatMessage({ turn }: { turn: Turn }) {
   }
 
   const { data } = turn;
+  const meta = INTENT_META[data.intent];
   return (
     <div className="msg msg--bot">
       <div className="bubble bubble--bot">
-        <span className="intent-tag">{INTENT_LABEL[data.intent] ?? data.intent}</span>
+        <span className={`intent-tag${meta ? ` intent--${meta.mana}` : ""}`}>
+          {meta?.label ?? data.intent}
+        </span>
         <p className="reply">{data.reply}</p>
 
         {data.trace && data.trace.length > 0 && (

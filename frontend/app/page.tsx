@@ -20,6 +20,20 @@ function newSessionId(): string {
   return `web-${Math.random().toString(36).slice(2, 10)}`;
 }
 
+// Emblema de la firma: los cinco colores de maná (WUBRG).
+const MANA = ["w", "u", "b", "r", "g"] as const;
+function ManaPips() {
+  return (
+    <div className="pips" aria-hidden="true">
+      {MANA.map((m) => (
+        <span key={m} className={`pip pip--${m}`}>
+          {m.toUpperCase()}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 export default function Home() {
   const [turns, setTurns] = useState<Turn[]>([]);
   const [input, setInput] = useState("");
@@ -52,18 +66,31 @@ export default function Home() {
   return (
     <main className="app">
       <header className="header">
-        <h1>🃏 Asistente MTG</h1>
-        <p>Reglas, interacciones, búsqueda y diseño de cartas — con fuentes citadas.</p>
+        <div className="brand">
+          <div>
+            <h1 className="brand__title">
+              Códice <span className="accent">de Reglas</span>
+            </h1>
+            <p className="tagline">
+              Asistente de Magic: The Gathering — cada veredicto cita su fuente.
+            </p>
+          </div>
+          <ManaPips />
+        </div>
       </header>
 
       <section className="chat">
         {turns.length === 0 && (
-          <div className="empty">
-            <p>
-              Pregunta lo que quieras sobre <em>Magic: The Gathering</em>. Cada respuesta cita
-              su fuente, y puedes desplegarla para ver el fragmento exacto del reglamento.
+          <div className="hero">
+            <div className="hero__pips">
+              <ManaPips />
+            </div>
+            <p className="hero__title">Consulta el reglamento</p>
+            <p className="hero__text">
+              Reglas, interacciones entre cartas, búsqueda por descripción y diseño de cartas.
+              Cada respuesta se funda en el reglamento oficial y puedes desplegar la fuente para
+              ver el fragmento exacto. Empieza por una de las consultas de abajo.
             </p>
-            <p>Empieza por una de las preguntas propuestas de abajo 👇</p>
           </div>
         )}
 
