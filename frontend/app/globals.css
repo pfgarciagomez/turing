@@ -50,44 +50,40 @@ body {
 
 body {
   min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
   color: var(--parch);
   font-family: var(--font-body);
   font-size: 18px; /* Garamond corre pequeño */
   line-height: 1.5;
-  /* Fondo atmosférico propio (sin arte con copyright): grano sutil + los cinco
-     colores de maná resplandeciendo desde los bordes. */
-  background-color: var(--ink-900);
+  /* Fondo mágico genérico: cielo místico violeta/índigo con estrellas tenues. */
+  background-color: #0d0a18;
   background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E"),
-    radial-gradient(820px 560px at 0% 0%, rgba(239, 230, 200, 0.05), transparent 55%),
-    radial-gradient(820px 560px at 100% 0%, rgba(79, 147, 214, 0.06), transparent 55%),
-    radial-gradient(820px 640px at 100% 100%, rgba(216, 92, 84, 0.06), transparent 55%),
-    radial-gradient(820px 640px at 0% 100%, rgba(95, 179, 95, 0.05), transparent 55%),
-    radial-gradient(1100px 760px at 50% 116%, rgba(154, 134, 192, 0.06), transparent 55%),
-    radial-gradient(1100px 720px at 50% -12%, rgba(201, 162, 39, 0.07), transparent 60%);
-  background-repeat: repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cg fill='%23ffffff' fill-opacity='0.5'%3E%3Ccircle cx='40' cy='60' r='0.9'/%3E%3Ccircle cx='150' cy='28' r='1.1'/%3E%3Ccircle cx='255' cy='92' r='0.8'/%3E%3Ccircle cx='95' cy='185' r='1'/%3E%3Ccircle cx='210' cy='225' r='0.9'/%3E%3Ccircle cx='290' cy='270' r='1.1'/%3E%3Ccircle cx='28' cy='275' r='0.8'/%3E%3Ccircle cx='175' cy='135' r='0.7'/%3E%3Ccircle cx='300' cy='40' r='0.8'/%3E%3Ccircle cx='120' cy='300' r='0.9'/%3E%3C/g%3E%3C/svg%3E"),
+    radial-gradient(circle at 50% -5%, rgba(124, 86, 196, 0.28), transparent 55%),
+    radial-gradient(circle at 85% 95%, rgba(64, 96, 190, 0.2), transparent 52%),
+    radial-gradient(circle at 12% 88%, rgba(150, 64, 176, 0.16), transparent 52%),
+    linear-gradient(160deg, #1c1338, #0c0a18 58%, #130a24);
+  background-repeat: repeat, no-repeat, no-repeat, no-repeat, no-repeat;
   background-attachment: fixed;
 }
 
-/* Sigilo arcano tenue detrás del contenido (firma de fondo, no distrae). */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  opacity: 0.06;
-  background: center 32% / 620px no-repeat
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cg fill='none' stroke='%23c9a227' stroke-width='1.2'%3E%3Ccircle cx='200' cy='200' r='192'/%3E%3Ccircle cx='200' cy='200' r='150'/%3E%3Ccircle cx='200' cy='200' r='86'/%3E%3Cpolygon points='200,18 371,144 306,346 94,346 29,144'/%3E%3Cpolygon points='200,64 318,168 272,318 128,318 82,168'/%3E%3C/g%3E%3C/svg%3E");
-}
-
+/* El chat vive en un panel centrado (un "tomo") que flota sobre el fondo. */
 .app {
-  max-width: 880px;
-  margin: 0 auto;
-  min-height: 100vh;
+  width: 100%;
+  max-width: 900px;
+  height: min(90vh, 920px);
   display: flex;
   flex-direction: column;
-  padding: 0 22px;
+  padding: 0 26px;
+  background: rgba(13, 10, 22, 0.82);
+  border: 1px solid var(--gold-line);
+  border-radius: 12px;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(3px);
+  overflow: hidden;
 }
 
 /* ---------- Cabecera (marca + emblema de pips = la firma) ---------------- */
@@ -542,12 +538,9 @@ body::before {
 .composer {
   display: flex;
   gap: 10px;
-  padding: 14px 0 24px;
+  padding: 14px 0 18px;
   border-top: 1px solid var(--gold-line);
-  position: sticky;
-  bottom: 0;
-  background:
-    linear-gradient(180deg, transparent, var(--ink-900) 22%);
+  background: transparent;
 }
 .composer__input {
   flex: 1;
