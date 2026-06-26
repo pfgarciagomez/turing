@@ -98,16 +98,46 @@ npm install
 npm run dev
 ```
 
-Abre **http://localhost:3000**. La UI trae una sugerencia por capacidad para probar las 4
+Abre **http://localhost:3000**. La UI trae una sugerencia por capacidad para probarlas
 con un clic. El backend expone `GET /health` y `POST /chat`.
 
-### Probar la API sin frontend
+---
+
+## Ejemplos de uso
+
+Todas las consultas van al mismo endpoint `POST /chat` con `{"question", "session_id"}`.
+La respuesta es **estructurada**: siempre `intent` + `reply`, y según la capacidad añade
+`sources` (reglas citadas, con su texto), `cards`, `card` o `sets`.
 
 ```bash
-curl -X POST http://localhost:8000/chat \
-  -H "Content-Type: application/json" \
+curl -X POST http://localhost:8000/chat -H "Content-Type: application/json" \
   -d '{"question": "¿Qué fases hay en un turno de juego?", "session_id": "demo"}'
 ```
+
+| # | Pregunta de ejemplo | `intent` | La respuesta incluye |
+|---|---|---|---|
+| 1 | *¿Cómo funciona el maná?* | `reglas_basicas` | `reply` en español + `sources` (reglas citadas con su nº y texto) |
+| 2 | *Si mi criatura con dañar primero bloquea a una con toque mortal, ¿qué pasa?* | `interaccion_cartas` | `reply` razonado + `sources` (reglas) + `cards` (cartas implicadas) |
+| 3 | *Busco una carta blanca de coste inferior a dos que sea guerrero* | `buscar_carta` | `reply` + `cards` (resultados de la API) + `filters` extraídos |
+| 4 | *Quiero una carta de Han Solo, blanca-roja, que tenga dañar primero* | `crear_carta` | `reply` + `card` (JSON de la carta custom) |
+| 5 | *¿Qué lanzamientos o sets han salido recientemente?* | `novedades` | `reply` + `sets` (lanzamientos recientes por fecha) |
+
+Ejemplo de respuesta (capacidad 1, recortada):
+
+```json
+{
+  "intent": "reglas_basicas",
+  "reply": "Un turno consta de cinco fases... (500.1).",
+  "trace": [{"label": "Router de intención", "detail": "Intención «reglas_basicas» — vía LLM", "ms": 700}],
+  "sources": [
+    {"rule_id": "500.1", "section": "5", "type": "rule", "score": 0.817,
+     "text": "A turn consists of five phases, in this order: beginning, ..."}
+  ]
+}
+```
+
+Cada respuesta del front muestra además un panel **"cómo se generó"** (la traza: router →
+herramientas → LLM) y las **fuentes desplegables** con el fragmento exacto del reglamento.
 
 ---
 
