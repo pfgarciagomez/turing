@@ -57,25 +57,7 @@ body {
 .empty {
   color: var(--muted);
   margin-top: 24px;
-}
-.suggestions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 12px;
-}
-.suggestion {
-  text-align: left;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  color: var(--text);
-  padding: 10px 12px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-.suggestion:hover {
-  border-color: var(--accent);
+  line-height: 1.5;
 }
 
 .msg {
@@ -126,15 +108,19 @@ body {
 }
 
 .sources {
-  margin-top: 10px;
+  margin-top: 12px;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 6px;
-  align-items: center;
 }
 .sources__label {
   color: var(--muted);
   font-size: 0.8rem;
+}
+.sources__list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 .chip {
   font-size: 0.75rem;
@@ -143,6 +129,56 @@ body {
   border: 1px solid var(--border);
   padding: 2px 8px;
   border-radius: 6px;
+  white-space: nowrap;
+}
+
+/* Fuente expandible (<details>): clic en el resumen para ver el chunk completo. */
+.source {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.source__summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+.source__summary::-webkit-details-marker {
+  display: none;
+}
+.source__summary::before {
+  content: "▸";
+  color: var(--muted);
+  font-size: 0.8rem;
+  transition: transform 0.15s ease;
+}
+.source[open] .source__summary::before {
+  transform: rotate(90deg);
+}
+.source__summary:hover {
+  background: rgba(108, 140, 255, 0.08);
+}
+.source__summary .chip {
+  background: var(--panel);
+}
+.source__meta {
+  font-size: 0.72rem;
+  color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+.source__text {
+  margin: 0;
+  padding: 8px 12px 12px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--text);
+  border-top: 1px solid var(--border);
+  white-space: pre-wrap;
 }
 
 .card-grid {
@@ -223,6 +259,50 @@ body {
 .error {
   color: #ff8a8a;
   font-size: 0.9rem;
+}
+
+/* Barra de preguntas propuestas, siempre visible sobre el composer. */
+.suggestions-bar {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 10px 0 4px;
+  scrollbar-width: thin;
+}
+.suggestion-chip {
+  flex: 0 0 auto;
+  max-width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.82rem;
+}
+.suggestion-chip:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+.suggestion-chip:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.suggestion-chip__cat {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  font-weight: 600;
+}
+.suggestion-chip__q {
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .composer {

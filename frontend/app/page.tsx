@@ -7,10 +7,13 @@ import { ChatMessage, type Turn } from "@/components/ChatMessage";
 // Una sugerencia por cada capacidad del enunciado, para que el evaluador
 // pueda probar las 4 con un clic.
 const SUGGESTIONS = [
-  "¿Qué fases hay en un turno de juego?",
-  "Mi criatura tiene dañar primero y bloquea a una con toque mortal, ¿qué pasa?",
-  "Busco una carta blanca de coste inferior a dos que sea guerrero",
-  "Quiero una carta de Han Solo, blanca-roja, que tenga dañar primero",
+  { cat: "Reglas", q: "¿Qué fases hay en un turno de juego?" },
+  {
+    cat: "Interacción",
+    q: "Mi criatura tiene dañar primero y bloquea a una con toque mortal, ¿qué pasa?",
+  },
+  { cat: "Búsqueda", q: "Busco una carta blanca de coste inferior a dos que sea guerrero" },
+  { cat: "Crear carta", q: "Quiero una carta de Han Solo, blanca-roja, que tenga dañar primero" },
 ];
 
 function newSessionId(): string {
@@ -56,14 +59,11 @@ export default function Home() {
       <section className="chat">
         {turns.length === 0 && (
           <div className="empty">
-            <p>Prueba una de las capacidades:</p>
-            <div className="suggestions">
-              {SUGGESTIONS.map((s) => (
-                <button key={s} className="suggestion" onClick={() => submit(s)}>
-                  {s}
-                </button>
-              ))}
-            </div>
+            <p>
+              Pregunta lo que quieras sobre <em>Magic: The Gathering</em>. Cada respuesta cita
+              su fuente, y puedes desplegarla para ver el fragmento exacto del reglamento.
+            </p>
+            <p>Empieza por una de las preguntas propuestas de abajo 👇</p>
           </div>
         )}
 
@@ -79,6 +79,22 @@ export default function Home() {
         {error && <div className="error">⚠️ {error}</div>}
         <div ref={endRef} />
       </section>
+
+      {/* Preguntas propuestas: siempre visibles, una por capacidad. */}
+      <div className="suggestions-bar" aria-label="Preguntas propuestas">
+        {SUGGESTIONS.map((s) => (
+          <button
+            key={s.q}
+            className="suggestion-chip"
+            onClick={() => submit(s.q)}
+            disabled={loading}
+            title={s.q}
+          >
+            <span className="suggestion-chip__cat">{s.cat}</span>
+            <span className="suggestion-chip__q">{s.q}</span>
+          </button>
+        ))}
+      </div>
 
       <form
         className="composer"

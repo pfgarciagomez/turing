@@ -36,12 +36,23 @@ export function ChatMessage({ turn }: { turn: Turn }) {
 
         {data.sources && data.sources.length > 0 && (
           <div className="sources">
-            <span className="sources__label">Fuentes:</span>
-            {data.sources.map((s, i) => (
-              <span key={`${s}-${i}`} className="chip">
-                {s}
-              </span>
-            ))}
+            <span className="sources__label">
+              Fuentes ({data.sources.length}) — clic para ver el fragmento usado:
+            </span>
+            <div className="sources__list">
+              {data.sources.map((s, i) => (
+                <details key={`${s.rule_id}-${i}`} className="source">
+                  <summary className="source__summary">
+                    <span className="chip">{s.rule_id}</span>
+                    <span className="source__meta">
+                      {s.type === "glossary" ? "glosario" : `sección ${s.section}`} · dist{" "}
+                      {s.score.toFixed(3)}
+                    </span>
+                  </summary>
+                  <p className="source__text">{s.text}</p>
+                </details>
+              ))}
+            </div>
           </div>
         )}
 

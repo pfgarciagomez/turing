@@ -18,6 +18,15 @@ export interface MtgCard {
   [k: string]: unknown;
 }
 
+// Chunk recuperado del reglamento, con su texto para poder expandirlo en el front.
+export interface Source {
+  rule_id: string;
+  section: string;
+  type: string; // "rule" | "glossary"
+  text: string;
+  score: number; // distancia (menor = más relevante)
+}
+
 export interface CustomCard {
   name: string;
   mana_cost: string;
@@ -33,7 +42,7 @@ export interface CustomCard {
 export interface ChatResponse {
   intent: Intent;
   reply: string;
-  sources?: string[];
+  sources?: Source[];
   cards?: MtgCard[];
   card?: CustomCard;
   filters?: Record<string, unknown>;

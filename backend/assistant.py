@@ -10,11 +10,26 @@ una sola vez y se reutilizan entre llamadas.
 """
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Sequence
 
 from backend.config import Settings, get_settings
 from backend.memory import SessionMemory
 from backend.router import Intent, IntentRouter
+
+
+def _serialize_sources(rules: Sequence[Any]) -> list[dict[str, Any]]:
+    """Serializa los chunks recuperados con su texto, para que el front pueda
+    mostrar la fuente expandible (no solo el nº de regla)."""
+    return [
+        {
+            "rule_id": r.rule_id,
+            "section": r.section,
+            "type": r.type,
+            "text": r.text,
+            "score": round(float(r.score), 4),
+        }
+        for r in rules
+    ]
 
 
 class Assistant:
@@ -79,13 +94,13 @@ class Assistant:
 
         if intent is Intent.RULES:
             res = self._get_rules_qa().answer(question, history)
-            payload = {"reply": res.answer, "sources": [r.rule_id for r in res.sources]}
+            payload = {"reply": res.answer, "sources": _serialize_sources(res.sources)}
 
         elif intent is Intent.INTERACTION:
             res = self._get_interactions().resolve(question, history)
             payload = {
                 "reply": res.answer,
-                "sources": [r.rule_id for r in res.rules],
+                "sources": _serialize_sources(res.rules),
                 "cards": res.cards,
             }
 
