@@ -182,7 +182,17 @@ def embed_and_load(
     settings = settings or get_settings()
     embedder = get_embedder(settings)
     client = chromadb.PersistentClient(path=settings.chroma_dir)
-    collection = client.get_or_create_collection(settings.chroma_collection)
+    # Recrea la colección para fijar la métrica COSENO (e5 se entrena con coseno).
+    # Chroma ignora el cambio de espacio si la colección ya existe, por eso se
+    # borra y se crea de nuevo; la ingesta es un rebuild completo del corpus.
+    try:
+        client.delete_collection(settings.chroma_collection)
+    except Exception:
+        pass
+    collection = client.create_collection(
+        settings.chroma_collection,
+        metadata={"hnsw:space": "cosine"},
+    )
 
     total = 0
     for batch in batched(chunks, batch_size):
